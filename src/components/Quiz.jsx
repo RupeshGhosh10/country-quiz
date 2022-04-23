@@ -6,10 +6,11 @@ import { Question } from './Question';
 import { QuizOver } from './QuizOver';
 
 const shuffleArray = (array) => {
-  return [...array]
-    .map(value => ({ value, sort: Math.random() }))
-    .sort((a, b) => a.sort - b.sort)
-    .map(({ value }) => value);
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
 }
 
 export const Quiz = ({ countries }) => {
