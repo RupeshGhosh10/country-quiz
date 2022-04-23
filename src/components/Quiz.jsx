@@ -18,9 +18,10 @@ export const Quiz = ({ countries }) => {
   const [correctOption, setCorrectOption] = useState('');
   const [selectedOption, setSelectedOption] = useState('');
   const [completed, setCompleted] = useState(false);
-  const [questionCount, setQuestionCount] = useState(1);
+  const [questionCount, setQuestionCount] = useState(0);
   const [score, setScore] = useState(0);
   const [flag, setFlag] = useState(null);
+  const [shuffledCountries, setShuffledCountries] = useState(shuffleArray(countries));
 
   const handleClick = (option) => {
     if (completed) return;
@@ -32,39 +33,39 @@ export const Quiz = ({ countries }) => {
   const handleNext = () => setQuestionCount(questionCount + 1);
 
   const handleTryAgain = () => {
-    setQuestionCount(1);
+    setQuestionCount(0);
     setScore(0);
     setCompleted(false);
+    setShuffledCountries(shuffleArray(countries));
   }
 
   useEffect(() => {
     setCompleted(false);
     setFlag(null);
-    const shuffledCountries = shuffleArray(countries).slice(0, 4);
+    const selectedCountries = shuffledCountries.slice(questionCount * 4, questionCount * 4 + 4);
     const random = Math.floor(Math.random() * 3) + 1;
     switch (random) {
       case 1:
-        setQuestion(`What is the capital of ${shuffledCountries[0]?.name?.common}?`);
-        setCorrectOption(shuffledCountries[0]?.capital[0]);
-        setOptions(shuffleArray(shuffledCountries.map(x => x?.capital[0])));
+        setQuestion(`What is the capital of ${selectedCountries[0]?.name?.common}?`);
+        setCorrectOption(selectedCountries[0]?.capital[0]);
+        setOptions(shuffleArray(selectedCountries.map(x => x?.capital[0])));
         break;
       case 2:
-        setQuestion(`${shuffledCountries[0].capital[0]} is the capital of which country?`);
-        setCorrectOption(shuffledCountries[0]?.name?.common);
-        setOptions(shuffleArray(shuffledCountries.map(x => x?.name?.common)));
+        setQuestion(`${selectedCountries[0].capital[0]} is the capital of which country?`);
+        setCorrectOption(selectedCountries[0]?.name?.common);
+        setOptions(shuffleArray(selectedCountries.map(x => x?.name?.common)));
         break;
       case 3:
-        setFlag(shuffledCountries[0]?.flags?.png);
+        setFlag(selectedCountries[0]?.flags?.png);
         setQuestion('This flag belongs to which country?');
-        setCorrectOption(shuffledCountries[0]?.name?.common);
-        setOptions(shuffleArray(shuffledCountries.map(x => x?.name?.common)));
+        setCorrectOption(selectedCountries[0]?.name?.common);
+        setOptions(shuffleArray(selectedCountries.map(x => x?.name?.common)));
         break;
-      default: 
+      default:
     }
+  }, [questionCount, shuffledCountries]);
 
-  }, [countries, questionCount]);
-
-  if (questionCount > 5) {
+  if (questionCount >= 5) {
     return <QuizOver score={score} handleTryAgain={handleTryAgain} />
   }
 
