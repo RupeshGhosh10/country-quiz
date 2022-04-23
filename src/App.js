@@ -16,7 +16,7 @@ const App = () => {
   }, []);
 
   return (
-    <main className='flex justify-center items-center flex-col mt-10 w-screen'>
+    <main className='flex justify-center items-center flex-col mt-0 sm:mt-10 w-screen'>
       <Header />
       <Card>
         {countries.length === 0 ? <Loading /> : <Quiz countries={countries} />}
