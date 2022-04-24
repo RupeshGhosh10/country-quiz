@@ -11,7 +11,7 @@ const App = () => {
   useEffect(() => {
     (async () => {
       const data = await getAllCountries();
-      setCountries(data.filter(x => x.capital !== undefined));
+      setCountries(data.filter(x => x.capital !== undefined && x.region !== 'Antarctic' && x.population >= 50000));
     })();
   }, []);
 
