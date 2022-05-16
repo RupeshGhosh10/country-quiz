@@ -4,46 +4,39 @@ import { Next } from './Next';
 import { OptionsList } from './OptionsList';
 import { Question } from './Question';
 import { QuizOver } from './QuizOver';
-
-const shuffleArray = (array) => {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array;
-}
+import { shuffleArray } from '../util/shuffle';
 
 export const Quiz = ({ countries }) => {
   const [question, setQuestion] = useState('');
   const [options, setOptions] = useState([]);
   const [correctOption, setCorrectOption] = useState('');
   const [selectedOption, setSelectedOption] = useState('');
-  const [completed, setCompleted] = useState(false);
-  const [questionCount, setQuestionCount] = useState(0);
+  const [quizCompleted, setQuizCompleted] = useState(false);
+  const [questionNumber, setQuestionNumber] = useState(0);
   const [score, setScore] = useState(0);
-  const [flag, setFlag] = useState(null);
+  const [countryFlag, setCountryFlag] = useState(null);
   const [shuffledCountries, setShuffledCountries] = useState(shuffleArray(countries));
 
   const handleClick = (option) => {
-    if (completed) return;
+    if (quizCompleted) return;
     if (correctOption === option) setScore(score + 1);
-    setCompleted(true);
+    setQuizCompleted(true);
     setSelectedOption(option);
   }
 
-  const handleNext = () => setQuestionCount(questionCount + 1);
+  const handleNext = () => setQuestionNumber(questionNumber + 1);
 
   const handleTryAgain = () => {
-    setQuestionCount(0);
+    setQuestionNumber(0);
     setScore(0);
-    setCompleted(false);
+    setQuizCompleted(false);
     setShuffledCountries(shuffleArray(countries));
   }
 
   useEffect(() => {
-    setCompleted(false);
-    setFlag(null);
-    const selectedCountries = shuffledCountries.slice(questionCount * 4, questionCount * 4 + 4);
+    setQuizCompleted(false);
+    setCountryFlag(null);
+    const selectedCountries = shuffledCountries.slice(questionNumber * 4, questionNumber * 4 + 4);
     const random = Math.floor(Math.random() * 3) + 1;
     switch (random) {
       case 1:
@@ -57,31 +50,31 @@ export const Quiz = ({ countries }) => {
         setOptions(shuffleArray(selectedCountries.map(x => x?.name?.common)));
         break;
       case 3:
-        setFlag(selectedCountries[0]?.flags?.png);
+        setCountryFlag(selectedCountries[0]?.flags?.png);
         setQuestion('This flag belongs to which country?');
         setCorrectOption(selectedCountries[0]?.name?.common);
         setOptions(shuffleArray(selectedCountries.map(x => x?.name?.common)));
         break;
       default:
     }
-  }, [questionCount, shuffledCountries]);
+  }, [questionNumber, shuffledCountries]);
 
-  if (questionCount >= 5) {
+  if (questionNumber >= 5) {
     return <QuizOver score={score} handleTryAgain={handleTryAgain} />
   }
 
   return (
     <div className='mt-7'>
-      {flag && <Flag flag={flag} />}
+      {countryFlag && <Flag flag={countryFlag} />}
       <Question question={question} />
       <OptionsList
         options={options}
         handleClick={handleClick}
-        completed={completed}
+        completed={quizCompleted}
         correctOption={correctOption}
         selectedOption={selectedOption}
       />
-      {completed && <Next handleNext={handleNext} />}
+      {quizCompleted && <Next handleNext={handleNext} />}
     </div>
   );
 }
